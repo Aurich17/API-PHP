@@ -10,17 +10,17 @@ $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 // Obtener las variables del archivo .env
-// $host = $_ENV['DB_HOST'];
-// $port = $_ENV['DB_PORT'];
-// $dbname = $_ENV['DB_NAME'];
-// $username = $_ENV['DB_USER'];
-// $password = $_ENV['DB_PASSWORD']; 
+$host = $_ENV['DB_HOST'];
+$port = $_ENV['DB_PORT'];
+$dbname = $_ENV['DB_NAME'];
+$username = $_ENV['DB_USER'];
+$password = $_ENV['DB_PASSWORD']; 
 
-$host = 'localhost';
-$port = '3306';
-$dbname = 'tienda_repuestos';
-$username = 'root';
-$password = ''; 
+// $host = 'localhost';
+// $port = '3306';
+// $dbname = 'tienda_repuestos';
+// $username = 'root';
+// $password = ''; 
 
 // Crear la cadena de conexión PDO
 $dsn = "mysql:host=$host;port=$port;dbname=$dbname";

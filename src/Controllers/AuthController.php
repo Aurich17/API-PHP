@@ -18,27 +18,34 @@ class AuthController {
     public function login(Request $request, Response $response, $args)
     {
         $params = $request->getParsedBody();
-    
         // Validar parámetros
-        if (empty($params['username']) || empty($params['password']) || empty($params['recaptcha_token'])) {
+        if (empty($params['username']) || empty($params['password']) || empty($params['token'])) {
             $response->getBody()->write(json_encode(['error' => 'Faltan datos obligatorios']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
         }
-    
         try {
             // Validar reCAPTCHA
-            $recaptchaResponse = $this->authService->validateRecaptchaToken($params['recaptcha_token'], 'login_action');
-            if (!$recaptchaResponse['success'] || $recaptchaResponse['score'] < 0.5) {
-                $response->getBody()->write(json_encode(['error' => 'Falló la validación de reCAPTCHA']));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            $recaptchaUrl = 'https://www.google.com/recaptcha/api/siteverify';
+            // // // LOCAL
+            // $recaptchaSecret = '6LfHMYsqAAAAAKY9PfYX2o5bwNw1clD-Wgx9w1my';
+            // PRODUCCION
+            $recaptchaSecret = '6LcAQYsqAAAAANJm0DNhPWQvYbQBHErRLvXkgFnK';
+            $recaptchaToken = $params['token'];
+            
+            $responseCaptcha = file_get_contents($recaptchaUrl . '?secret=' . $recaptchaSecret . '&response=' . $recaptchaToken);
+            $responseKeys = json_decode($responseCaptcha, true);
+
+            if (intval($responseKeys["success"]) !== 1) {
+                error_log('Falló la validación de reCAPTCHA');
+                return $response->withJson(['error' => 'Falló la validación de reCAPTCHA'], 400);
             }
-    
-            // Autenticar usuario
+
+            // Continuar con la autenticación del usuario
             $token = $this->authService->authenticateUser($params['username'], $params['password']);
-    
+
             $response->getBody()->write(json_encode(['access_token' => $token]));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
-    
+
         } catch (Exception $e) {
             error_log('Error de login: ' . $e->getMessage());
             $response->getBody()->write(json_encode(['error' => $e->getMessage()]));

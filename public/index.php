@@ -3,10 +3,11 @@
     require '../vendor/autoload.php';
     require '../src/Database/db.php';
     require '../src/Routes/AuthRoutes.php';
-
+    
     // Usar el AppFactory para crear la aplicación
     use Slim\Factory\AppFactory;
     use DI\Container;
+    
 
     // Crear la aplicación Slim
     $container = new Container();
@@ -52,6 +53,7 @@
     new \App\Routes\UserRoutes($app, $pdo);
     new \App\Routes\TipoRoutes($app, $pdo);
     new \App\Routes\AuthRoutes($app, $pdo);
+    new \App\Routes\PaypalRoutes($app, $pdo);
     
     $app->run();
 ?>
